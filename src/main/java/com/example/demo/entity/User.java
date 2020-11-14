@@ -3,6 +3,8 @@ package com.example.demo.entity;
 import com.sun.istack.NotNull;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
@@ -19,6 +21,11 @@ public class User {
     private String email;
 
     private String password;
+
+     @ManyToMany(fetch = FetchType.LAZY)
+     @JoinTable(name = "user_role",joinColumns = @JoinColumn(columnDefinition = "clientId"),inverseJoinColumns = @JoinColumn(columnDefinition = "roleId"))
+    private Set<Role> roles = new HashSet<>();
+
 
     public User() {
     }
@@ -71,5 +78,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }

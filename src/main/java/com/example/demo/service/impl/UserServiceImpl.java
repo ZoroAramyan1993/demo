@@ -2,12 +2,14 @@ package com.example.demo.service.impl;
 
 import com.example.demo.dto.UserDto;
 import com.example.demo.entity.User;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
 
 
 import java.util.List;
@@ -57,6 +59,10 @@ public class UserServiceImpl implements UserService {
         }
         return ResponseEntity.ok(user.get());
     }
+
+
+
+
 
     @Override
     public boolean userExist(String email) {

@@ -2,19 +2,26 @@ package com.example.demo.controller;
 
 
 
+import com.example.demo.configuration.SecurityConfig;
 import com.example.demo.dto.UserDto;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-
+@Import(SecurityConfig.class)
 @RestController
 @RequestMapping("user")
 public class UserController {
@@ -22,6 +29,8 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Autowired(required = true)
+    AuthenticationManager authenticationManager;
 
 
     @GetMapping("get{id}")
@@ -48,6 +57,13 @@ ResponseEntity<User>getUser(@PathVariable("email") String email){
       return userService.addUser(userDto);
    }
 
+   @PostMapping("/authenticate")
+ResponseEntity<?>authenticateUser( @RequestBody UserDto userDto){
+    Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+            userDto.getEmail(),userDto.getPassword()));
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+    return ResponseEntity.ok().build();
+}
 
 
       @PutMapping("/update")
