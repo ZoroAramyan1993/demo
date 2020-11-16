@@ -21,9 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@Import(SecurityConfig.class)
+
+@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("user")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -32,42 +33,44 @@ public class UserController {
     @Autowired(required = true)
     AuthenticationManager authenticationManager;
 
+    @Autowired
+     UserRepository userRepository;
 
-    @GetMapping("get{id}")
-   ResponseEntity<User>get(Integer id){
-       return userService.get(id);
-   }
+    @GetMapping("/get/{id}")
+    ResponseEntity<User>get(Integer id){
+        return userService.get(id);
+    }
 
-    @GetMapping("/get{email}")
-ResponseEntity<User>getUser(@PathVariable("email") String email){
+    @GetMapping("/get/{email}")
+    ResponseEntity<User>getUser(@PathVariable("email") String email){
         return userService.getByEmail(email);
     }
 
     @GetMapping("/get")
     List<User> getAll(){
-      return userService.getAll();
-}
+        return userService.getAll();
+    }
 
 
-   @PostMapping("/save")
-   ResponseEntity<?>saveUser(@Validated @RequestBody UserDto userDto){
-//      User user = new User(userDto.getName(),userDto.getSurName(),userDto.getEmail(),userDto.getPassword());
-//      userRepository.save(user);
-//       return ResponseEntity.ok(user);
-      return userService.addUser(userDto);
-   }
+    @PostMapping("/save")
+    ResponseEntity<User> saveUser(@RequestBody UserDto userDto){
+      User user = new User(userDto.getName(),userDto.getSurName(),userDto.getEmail(),userDto.getPassword());
+      userRepository.save(user);
+       return ResponseEntity.ok(user);
 
-   @PostMapping("/authenticate")
-ResponseEntity<?>authenticateUser( @RequestBody UserDto userDto){
-    Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-            userDto.getEmail(),userDto.getPassword()));
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    return ResponseEntity.ok().build();
-}
+    }
+
+    @PostMapping("/authenticate")
+    ResponseEntity<User>authenticateUser( @RequestBody UserDto userDto){
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                userDto.getEmail(),userDto.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return ResponseEntity.ok().build();
+    }
 
 
-      @PutMapping("/update")
-   Optional <User> updateUser(@Validated @RequestBody UserDto userDto, Integer userId){
+    @PutMapping("/update")
+    Optional <User> updateUser(@Validated @RequestBody UserDto userDto, Integer userId){
 //        userService.get(userId).map(user-> {
 //            user.setName(userDto.getName());
 //            user.setSurName(userDto.getSurName());
@@ -88,13 +91,13 @@ ResponseEntity<?>authenticateUser( @RequestBody UserDto userDto){
 //          }
 //
 //          return ResponseEntity.ok(user);
-         return userService.updateUser(userDto,userId);
-     }
+        return userService.updateUser(userDto,userId);
+    }
 
-     @DeleteMapping("/delete{id}")
-     ResponseEntity deleteUser(@PathVariable("id") Integer id){
+    @DeleteMapping("/delete{id}")
+    ResponseEntity deleteUser(@PathVariable("id") Integer id){
 //       userRepository.deleteById(id);
 //        return ResponseEntity.ok().build();
-         return userService.delete(id);
-     }
+        return userService.delete(id);
+    }
 }
