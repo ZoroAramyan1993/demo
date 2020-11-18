@@ -1,19 +1,19 @@
 package com.example.demo.dto;
 
 public class UserDto {
-    private int id;
+ //   private int id;
     private String name;
     private String surName;
     private String email;
     private String password;
 
-    public int getId() {
-        return id;
-    }
+   // public int getId() {
+    //    return id;
+  //  }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+   // public void setId(int id) {
+  //      this.id = id;
+  //  }
 
     public String getName() {
         return name;

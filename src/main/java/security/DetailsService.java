@@ -29,4 +29,9 @@ public class DetailsService implements UserDetailsService {
        User user = userRepository.findById(id).orElseThrow(()->new ResourceAccessException("not found" + id));
        return UserPrincipal.createUser(user);
     }
+
+    public UserDetails finById(Integer id) {
+        User user = userRepository.findById(Math.toIntExact(id)).orElseThrow(()->new ResourceAccessException("not found" + id));
+        return UserPrincipal.createUser(user);
+    }
 }

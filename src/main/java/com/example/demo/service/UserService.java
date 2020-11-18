@@ -13,7 +13,7 @@ public interface UserService {
 
     ResponseEntity<User> addUser(UserDto userDto);
 
-    ResponseEntity<User> get(int id);
+    ResponseEntity<User> get(Integer id);
 
     ResponseEntity<User> getByEmail(String emil);
 
@@ -23,5 +23,5 @@ public interface UserService {
 
     List<User> getAll();
 
-    ResponseEntity delete(int id);
+    ResponseEntity delete(Integer id);
 }

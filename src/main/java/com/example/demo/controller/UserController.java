@@ -2,22 +2,29 @@ package com.example.demo.controller;
 
 
 
-import com.example.demo.configuration.SecurityConfig;
+
+import com.example.demo.dto.SignUp;
 import com.example.demo.dto.UserDto;
+import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
+import com.example.demo.exception.ApiException;
+import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.role.RoleName;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
+import org.springframework.expression.ExpressionException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,15 +43,21 @@ public class UserController {
     @Autowired
      UserRepository userRepository;
 
+
+    @Autowired
+    RoleRepository roleRepository;
+//
+//    @Autowired
+//    JwtTokenProvider jwtTokenProvider;
     @GetMapping("/get/{id}")
     ResponseEntity<User>get(Integer id){
         return userService.get(id);
     }
 
-    @GetMapping("/get/{email}")
-    ResponseEntity<User>getUser(@PathVariable("email") String email){
-        return userService.getByEmail(email);
-    }
+//    @GetMapping("/get/{email}")
+//    ResponseEntity<User>getUser(@PathVariable("email") String email){
+//        return userService.getByEmail(email);
+//    }
 
     @GetMapping("/get")
     List<User> getAll(){
@@ -53,21 +66,59 @@ public class UserController {
 
 
     @PostMapping("/save")
-    ResponseEntity<User> saveUser(@RequestBody UserDto userDto){
-      User user = new User(userDto.getName(),userDto.getSurName(),userDto.getEmail(),userDto.getPassword());
-      userRepository.save(user);
-       return ResponseEntity.ok(user);
+    ResponseEntity<?> saveUser(@RequestBody UserDto userDto){
+//      User user = new User(userDto.getName(),userDto.getSurName(),userDto.getEmail(),userDto.getPassword());
+//      userRepository.save(user);
+//       return ResponseEntity.ok(user);
 
+        User user = new User(userDto.getName(),userDto.getSurName(),userDto.getEmail(),userDto.getPassword());
+        if(user.getEmail().equals("manager777")) {
+            Role userRole = roleRepository.findByRoleName(RoleName.MANAGER).
+                    orElseThrow(() -> new ApiException("manager role not set"));
+            user.setRoles(Collections.singleton(userRole));
+        }else{
+            Role clientRole = roleRepository.findByRoleName(RoleName.USER).
+                    orElseThrow(() -> new ExpressionException("user Role not set"));
+            user.setRoles(Collections.singleton(clientRole));
+        }
+        userRepository.save(user);
+        URI location  = ServletUriComponentsBuilder.
+                fromCurrentContextPath().path("/user/{id}").
+                buildAndExpand(user.getEmail()).toUri();
+        //return ResponseEntity.created(location).body(new ApiResponse(true, "Client created successfull"));
+        return ResponseEntity.ok(user);
     }
+
+//    public Optional<User> updateUser(UserDto userDto, Integer id) {
+//        Optional<User>user = userRepository.findById(id);
+//        if (user.isPresent()){
+//            user.get().setName(userDto.getName());
+//            user.get().setSurName(userDto.getSurName());
+//            user.get().setEmail(userDto.getEmail());
+//            user.get().setPassword(userDto.getPassword());
+//            return Optional.of(userRepository.save(user.get()));
+//        }else {
+//            return Optional.empty();
+//        }
+//    }
 
     @PostMapping("/authenticate")
-    ResponseEntity<User>authenticateUser( @RequestBody UserDto userDto){
+    String authenticateUser( @RequestBody SignUp signUp){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                userDto.getEmail(),userDto.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return ResponseEntity.ok().build();
+                signUp.getEmail(),signUp.getPassword()));
+       SecurityContextHolder.getContext().setAuthentication(authentication);
+//        String jwt = jwtTokenProvider.generateToken(authentication);
+//        return  ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+        return "authenticate";
+
+
+
     }
 
+//    @PostMapping("/authenticate")
+//   Principal authenticateUser(Principal user){
+//       return user;
+//    }
 
     @PutMapping("/update")
     Optional <User> updateUser(@Validated @RequestBody UserDto userDto, Integer userId){
@@ -99,5 +150,30 @@ public class UserController {
 //       userRepository.deleteById(id);
 //        return ResponseEntity.ok().build();
         return userService.delete(id);
+    }
+
+    @GetMapping("/getEmail")
+    public ResponseEntity<User>getUser (@RequestParam String email){
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isPresent()){
+            return ResponseEntity.ok(user.get());
+        }else{
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    @GetMapping("/role")
+    public ResponseEntity<RoleName>getUserRole(@RequestParam String username){
+        Optional<User> user = userRepository.findByEmail(username);
+//        String role = null;
+        if(user.isPresent()){
+            if (this.roleRepository.getRoleId(user.get().getId()) == 1){
+                return ResponseEntity.ok(RoleName.USER);
+            }
+            return ResponseEntity.ok(RoleName.MANAGER);
+        }else{
+            return ResponseEntity.notFound().build();
+        }
     }
 }

@@ -36,6 +36,10 @@ public class UserPrincipal implements UserDetails {
         return authorites;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
     @Override
     public String getPassword() {
         return null;
