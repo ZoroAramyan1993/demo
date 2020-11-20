@@ -31,25 +31,25 @@ public class UserServiceImpl implements UserService {
     @Autowired
     RoleRepository roleRepository;
 
-    @Override
-    public ResponseEntity<User> addUser(UserDto userDto) {
-        User user = new User(userDto.getName(),userDto.getSurName(),userDto.getEmail(),userDto.getPassword());
-        if(user.getEmail().equals("manager777")) {
-            Role userRole = roleRepository.findByRoleName(RoleName.MANAGER).
-                    orElseThrow(() -> new ApiException("manager role not set"));
-            user.setRoles(Collections.singleton(userRole));
-        }else{
-            Role clientRole = roleRepository.findByRoleName(RoleName.USER).
-                    orElseThrow(() -> new ExpressionException("user Role not set"));
-            user.setRoles(Collections.singleton(clientRole));
-        }
-        userRepository.save(user);
-        URI location  = ServletUriComponentsBuilder.
-                fromCurrentContextPath().path("/user/{id}").
-                buildAndExpand(user.getEmail()).toUri();
-        //return ResponseEntity.created(location).body(new ApiResponse(true, "Client created successfull"));
-        return ResponseEntity.ok(user);
-    }
+//    @Override
+//    public ResponseEntity<User> addUser(UserDto userDto) {
+//        User user = new User(userDto.getName(),userDto.getSurName(),userDto.getEmail(),userDto.getPassword());
+//        if(user.getEmail().equals("manager777")) {
+//            Role userRole = roleRepository.findByRoleName(RoleName.MANAGER).
+//                    orElseThrow(() -> new ApiException("manager role not set"));
+//            user.setRoles(Collections.singleton(userRole));
+//        }else{
+//            Role clientRole = roleRepository.findByRoleName(RoleName.USER).
+//                    orElseThrow(() -> new ExpressionException("user Role not set"));
+//            user.setRoles(Collections.singleton(clientRole));
+//        }
+//        userRepository.save(user);
+//        URI location  = ServletUriComponentsBuilder.
+//                fromCurrentContextPath().path("/user/{id}").
+//                buildAndExpand(user.getEmail()).toUri();
+//        //return ResponseEntity.created(location).body(new ApiResponse(true, "Client created successfull"));
+//        return ResponseEntity.ok(user);
+//    }
 
     public Optional<User> updateUser(UserDto userDto, Integer id) {
        Optional<User>user = userRepository.findById(id);
@@ -63,6 +63,8 @@ public class UserServiceImpl implements UserService {
            return Optional.empty();
        }
     }
+
+
 
     @Override
     public ResponseEntity<User> get(Integer id) {
@@ -100,7 +102,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
    public ResponseEntity  delete(Integer id) {
-        userRepository.deleteById(Math.toIntExact(id));
+        Optional<User> user = userRepository.findById(id);
+        if (!user.isPresent()){
+            ResponseEntity.notFound().build();
+        }
+        userRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
 }

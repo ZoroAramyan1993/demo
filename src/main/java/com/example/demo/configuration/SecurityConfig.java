@@ -1,7 +1,9 @@
 package com.example.demo.configuration;
 
 
+import com.example.demo.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,6 +12,7 @@ import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,6 +29,7 @@ import security.DetailsService;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.io.IOException;
 
 
@@ -62,6 +66,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+
+
 //    @Override
 //    protected void configure(HttpSecurity http) throws Exception {
 //        http.
@@ -72,7 +78,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .antMatchers("/admin/**").hasAuthority("ADMIN")
 //                .antMatchers("/user/**").hasAuthority("USER").anyRequest()
 //                .authenticated().and().csrf().disable().formLogin()
-//                .loginPage("/login").failureUrl("/login?error=true")
 //                .successHandler(new AuthenticationSuccessHandler() {
 //                    RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 //
@@ -102,7 +107,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .accessDeniedPage("/access-denied");
 //    }
 
-
     //    @Autowired(required = true)
 //    JwtAuthenticationEntryPoint unauthorizedHandler;
 //
@@ -116,29 +120,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable().sessionManagement().
-                sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests()
-                .antMatchers("/", "/home").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin()
-                .loginPage("/authenticate")
-                .permitAll()
-                .and()
-                .logout()
-                .permitAll();
-
-//        http
-//                .cors()
-//                .and()
-//                .csrf()
-//                .disable()
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
+//        http.cors().and().csrf().disable().sessionManagement().
+//                sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 //                .authorizeRequests()
-//                .antMatchers("/",
+//                .antMatchers("/", "/home").permitAll()
+//                .anyRequest().authenticated()
+//                .and()
+//                .formLogin()
+//                .loginPage("/authenticate")
+//                .permitAll()
+//                .and()
+//                .logout()
+//                .permitAll();
+
+        http
+                .cors()
+                .and()
+                .csrf()
+                .disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                .antMatchers("/"
 //                        "/favicon.ico",
 //                        "/**/*.png",
 //                        "/**/*.gif",
@@ -147,18 +151,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                        "/**/*.html",
 //                        "/**/*.css",
 //                        "/**/*.js")
-//                .permitAll()
-//                .antMatchers( "/user/**")
-//                .permitAll()
+                )
+                .permitAll()
+                .antMatchers( "/user/**")
+                .permitAll()
 //                .antMatchers("/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
 //                .permitAll()
-//                .antMatchers(HttpMethod.GET, "/user**")
-//                .permitAll()
-//                .antMatchers(HttpMethod.POST, "/user**")
-//                .permitAll()
-//                .anyRequest()
-//                .authenticated();
-//
+                .antMatchers(HttpMethod.GET, "/user**")
+                .permitAll()
+                .antMatchers(HttpMethod.POST, "/user**")
+                .permitAll()
+                .anyRequest()
+                .authenticated();
+
 
     }
 

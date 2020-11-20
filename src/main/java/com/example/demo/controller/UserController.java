@@ -46,11 +46,10 @@ public class UserController {
 
     @Autowired
     RoleRepository roleRepository;
-//
-//    @Autowired
-//    JwtTokenProvider jwtTokenProvider;
+
+
     @GetMapping("/get/{id}")
-    ResponseEntity<User>get(Integer id){
+    ResponseEntity<User>get(@PathVariable("id") Integer id){
         return userService.get(id);
     }
 
@@ -67,9 +66,6 @@ public class UserController {
 
     @PostMapping("/save")
     ResponseEntity<?> saveUser(@RequestBody UserDto userDto){
-//      User user = new User(userDto.getName(),userDto.getSurName(),userDto.getEmail(),userDto.getPassword());
-//      userRepository.save(user);
-//       return ResponseEntity.ok(user);
 
         User user = new User(userDto.getName(),userDto.getSurName(),userDto.getEmail(),userDto.getPassword());
         if(user.getEmail().equals("manager777")) {
@@ -85,70 +81,59 @@ public class UserController {
         URI location  = ServletUriComponentsBuilder.
                 fromCurrentContextPath().path("/user/{id}").
                 buildAndExpand(user.getEmail()).toUri();
-        //return ResponseEntity.created(location).body(new ApiResponse(true, "Client created successfull"));
         return ResponseEntity.ok(user);
     }
 
-//    public Optional<User> updateUser(UserDto userDto, Integer id) {
-//        Optional<User>user = userRepository.findById(id);
-//        if (user.isPresent()){
-//            user.get().setName(userDto.getName());
-//            user.get().setSurName(userDto.getSurName());
-//            user.get().setEmail(userDto.getEmail());
-//            user.get().setPassword(userDto.getPassword());
-//            return Optional.of(userRepository.save(user.get()));
-//        }else {
-//            return Optional.empty();
-//        }
+
+//    @PostMapping("/authenticate")
+//    String login( @RequestBody SignUp signUp){
+////        if (signUp.getEmail().equals(user.getEmail()) && signUp.getPassword().equals(user.getPassword())){
+////            return "home";
+////        }
+//        return "home";
 //    }
 
     @PostMapping("/authenticate")
-    String authenticateUser( @RequestBody SignUp signUp){
+   ResponseEntity<?> authenticateUser( @RequestBody SignUp signUp){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 signUp.getEmail(),signUp.getPassword()));
-       SecurityContextHolder.getContext().setAuthentication(authentication);
-//        String jwt = jwtTokenProvider.generateToken(authentication);
-//        return  ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
-        return "authenticate";
+          SecurityContextHolder.getContext().setAuthentication(authentication);
 
-
+        return ResponseEntity.ok().build();
 
     }
 
-//    @PostMapping("/authenticate")
-//   Principal authenticateUser(Principal user){
-//       return user;
-//    }
-
     @PutMapping("/update")
-    Optional <User> updateUser(@Validated @RequestBody UserDto userDto, Integer userId){
-//        userService.get(userId).map(user-> {
+    ResponseEntity<User> updateUser(@Validated @RequestBody UserDto userDto,@RequestParam("userId") Integer userId){
+        Optional<User>user = userRepository.findById(userId);
+        if (!user.isPresent()){
+          return   ResponseEntity.notFound().build();
+        }
+//        userRepository.findById(userId).map(user-> {
 //            user.setName(userDto.getName());
 //            user.setSurName(userDto.getSurName());
 //            user.setEmail(userDto.getEmail());
 //            user.setPassword(userDto.getPassword());
-//            userService.addUser(user);
+//            userRepository.save(user);
 //            return ResponseEntity.ok(user);
 //        });
-//        return ResponseEntity.notFound().build();
+       // return ResponseEntity.notFound().build();
 
 //          Optional<User>user = userRepository.findById(userId);
-//          if (user.isPresent()){
-//              user.get().setName(userDto.getName());
-//              user.get().setSurName(userDto.getSurName());
-//              user.get().setEmail(userDto.getEmail());
-//              user.get().setPassword(userDto.getPassword());
-//              userRepository.save(user.get());
-//          }
-//
-//          return ResponseEntity.ok(user);
-        return userService.updateUser(userDto,userId);
+       //   if (user.isPresent()){
+              user.get().setName(userDto.getName());
+              user.get().setSurName(userDto.getSurName());
+              user.get().setEmail(userDto.getEmail());
+              user.get().setPassword(userDto.getPassword());
+              userRepository.save(user.get());
+        //  }
+
+          return ResponseEntity.ok(user.get());
+      //  return userService.updateUser(userDto,userId);
     }
 
-    @DeleteMapping("/delete{id}")
+    @DeleteMapping("/delete/{id}")
     ResponseEntity deleteUser(@PathVariable("id") Integer id){
-//       userRepository.deleteById(id);
-//        return ResponseEntity.ok().build();
         return userService.delete(id);
     }
 
@@ -166,7 +151,6 @@ public class UserController {
     @GetMapping("/role")
     public ResponseEntity<RoleName>getUserRole(@RequestParam String username){
         Optional<User> user = userRepository.findByEmail(username);
-//        String role = null;
         if(user.isPresent()){
             if (this.roleRepository.getRoleId(user.get().getId()) == 1){
                 return ResponseEntity.ok(RoleName.USER);

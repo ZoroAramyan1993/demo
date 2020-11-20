@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface UserService {
 
-    ResponseEntity<User> addUser(UserDto userDto);
+   // ResponseEntity<User> addUser(UserDto userDto);
 
     ResponseEntity<User> get(Integer id);
 
