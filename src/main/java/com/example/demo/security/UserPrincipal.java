@@ -1,4 +1,4 @@
-package security;
+package com.example.demo.security;
 
 import com.example.demo.entity.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,9 +16,9 @@ public class UserPrincipal implements UserDetails {
     private String surName;
     private String email;
     private String password;
-    private  Collection<? extends GrantedAuthority>authorites;
+    private Collection<? extends GrantedAuthority> authorites;
 
-    public UserPrincipal(Integer id,String name,String surName,String email,String password,Collection<? extends GrantedAuthority>authorities) {
+    public UserPrincipal(Integer id, String name, String surName, String email, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
         this.surName = surName;
@@ -27,10 +27,11 @@ public class UserPrincipal implements UserDetails {
         this.authorites = authorities;
     }
 
-    public static UserPrincipal createUser(User user){
-        List<GrantedAuthority>authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName().name())).collect(Collectors.toList());
-          return new UserPrincipal(user.getId(),user.getName(),user.getSurName(),user.getEmail(),user.getPassword(),authorities);
+    public static UserPrincipal createUser(User user) {
+        List<GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName().name())).collect(Collectors.toList());
+        return new UserPrincipal(user.getId(), user.getName(), user.getSurName(), user.getEmail(), user.getPassword(), authorities);
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorites;

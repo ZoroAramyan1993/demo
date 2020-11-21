@@ -1,9 +1,11 @@
 package com.example.demo.configuration;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.*;
 
-public class WebMvcConfig extends WebMvcConfigurerAdapter {
+@Configuration
+public class WebMvcConfig implements WebMvcConfigurer {
     private static final long MAX_AGE_SICS = 3600;
 
     @Bean
@@ -13,12 +15,10 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
             @Override
             public void addViewControllers(ViewControllerRegistry registry) {
                 ViewControllerRegistration r = registry.addViewController("/");
-                r.setViewName("forward:/register.html");
+                r.setViewName("register.html");
             }
         };
     }
-
-
 
 
     @Override

@@ -1,14 +1,19 @@
 package com.example.demo.entity;
 
 import com.sun.istack.NotNull;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class User{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @NotNull
@@ -22,8 +27,8 @@ public class User {
 
     private String password;
 
-     @ManyToMany(fetch = FetchType.LAZY)
-     @JoinTable(name = "user_role",joinColumns = @JoinColumn(columnDefinition = "user_id"),inverseJoinColumns = @JoinColumn(columnDefinition = "role_id"))
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_role", joinColumns = @JoinColumn(columnDefinition = "user_id"), inverseJoinColumns = @JoinColumn(columnDefinition = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
 
@@ -35,9 +40,6 @@ public class User {
         this.surName = surName;
         this.email = email;
         this.password = password;
-    }
-
-    public User(String name, String surName, String email) {
     }
 
     public Integer getId() {

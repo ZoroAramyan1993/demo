@@ -1,8 +1,7 @@
-package security;
+package com.example.demo.security;
 
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,11 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 
 @Service
-public class DetailsService implements UserDetailsService {
+public class ApplicationUserDetailsService implements UserDetailsService {
 
+    final UserRepository userRepository;
 
-    @Autowired(required = true )
-    UserRepository userRepository;
+    public ApplicationUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Transactional
     @Override

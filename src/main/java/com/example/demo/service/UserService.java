@@ -11,17 +11,17 @@ import java.util.Optional;
 
 public interface UserService {
 
-   // ResponseEntity<User> addUser(UserDto userDto);
+    Optional<User> get(Integer id);
 
-    ResponseEntity<User> get(Integer id);
+    Optional<User> save(User user);
 
-    ResponseEntity<User> getByEmail(String emil);
+    Optional<User> getByEmail(String emil);
 
-    boolean userExist(String email);
+    boolean existsByEmail(String email);
 
-    public Optional<User> updateUser(UserDto userDto, Integer id);
+    Optional<User> updateUser(UserDto userDto, Integer id);
 
     List<User> getAll();
 
-    ResponseEntity delete(Integer id);
+    void deleteById(Integer id);
 }
